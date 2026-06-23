@@ -1,0 +1,24 @@
+# Data Directory
+# Place your datasets here
+
+data/
+├── raw/                    # Original collected data
+│   ├── images/
+│   └── annotations/
+├── processed/              # Preprocessed data
+│   ├── train/
+│   ├── val/
+│   └── test/
+├── datasets/               # Formatted datasets
+│   ├── yolo_detection/
+│   │   ├── train/
+│   │   │   ├── images/
+│   │   │   └── labels/
+│   │   ├── val/
+│   │   │   ├── images/
+│   │   │   └── labels/
+│   │   └── data.yaml
+│   └── ocr_recognition/
+│       ├── train/
+│       └── val/
+└── external/               # Public datasets

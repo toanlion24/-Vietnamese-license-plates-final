@@ -1,0 +1,9 @@
+# Models Directory
+# Store trained models here
+
+models/
+├── yolov11/               # Detection model
+│   └── best.pt
+├── paddleocr/            # Recognition model
+│   └── best/
+└── pipeline/             # Full pipeline export

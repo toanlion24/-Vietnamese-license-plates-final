@@ -1,0 +1,6 @@
+# Outputs Directory
+outputs/
+├── logs/                  # Training logs
+├── visualizations/        # Detection/recognition visualizations
+├── results/              # Evaluation results
+└── exports/              # Exported models

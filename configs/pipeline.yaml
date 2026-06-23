@@ -1,0 +1,89 @@
+# Pipeline Configuration
+pipeline:
+  name: "VietnameseLPR"
+  version: "1.0.0"
+  device: "cuda"  # cuda or cpu
+
+# Detection Settings (YOLOv11)
+detection:
+  model_name: "yolov11s"
+  model_path: "models/yolov11/best.pt"
+  confidence_threshold: 0.25
+  nms_threshold: 0.45
+  input_size: 640
+  max_detections: 10
+  classes:
+    - license_plate
+
+# Recognition Settings (PaddleOCR)
+recognition:
+  config_path: "configs/recognition.yaml"
+  model_path: "models/paddleocr/best"
+  confidence_threshold: 0.5
+  dictionary_path: "configs/vietnamese_dict.txt"
+  
+  # Model configuration
+  rec_image_shape: "3, 48, 320"
+  rec_batch_num: 6
+  max_text_length: 25
+  
+  # Engine settings
+  use_angle_cls: true
+  use_gpu: true
+
+# Preprocessing Settings
+preprocessing:
+  enable: true
+  clahe:
+    enable: true
+    clip_limit: 2.0
+    grid_size: [8, 8]
+  resize:
+    enable: true
+    max_width: 1920
+    max_height: 1080
+    maintain_aspect_ratio: true
+  normalize:
+    enable: true
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+
+# Plate Processing Settings
+plate_processing:
+  padding_percent: 0.1
+  perspective_correction: true
+  type_classification:
+    enable: true
+    types:
+      - private_car
+      - commercial
+      - motorcycle
+      - police
+      - army
+
+# Post-processing Settings
+postprocessing:
+  normalize_text: true
+  validate_format: true
+  min_confidence: 0.7
+  spell_check: false  # Enable if you have a dictionary
+  
+  # Vietnamese plate patterns
+  patterns:
+    private_car: '^\d{2}[A-Z]-\d{4}\.\d{2}$'
+    motorcycle: '^\d{2}-\d{5}(\.\d{2})?$'
+    police: '^\d{2}-\d{4}-\d{2}$'
+    army: '^\d{6}-\d{2}$'
+
+# Output Settings
+output:
+  include_debug_images: false
+  include_processing_time: true
+  include_bbox: true
+  log_level: "INFO"
+
+# Video Stream Settings
+video:
+  frame_skip: 0  # Process every N frames (0 = all)
+  batch_size: 1
+  buffer_size: 30

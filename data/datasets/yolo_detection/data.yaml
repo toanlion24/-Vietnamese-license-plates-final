@@ -1,0 +1,13 @@
+# Vietnamese License Plate Detection Dataset
+
+# Paths
+train: ./train/images
+val: ./val/images
+
+# Classes
+nc: 1
+names: ['license_plate']
+
+# Dataset info
+# Total images: TBD
+# Annotations: TBD

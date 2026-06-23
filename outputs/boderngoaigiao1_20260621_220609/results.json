@@ -1,0 +1,19 @@
+{
+  "image": "LicensePlateDetectionDataset\\images\\test\\boderngoaigiao1.jpg",
+  "model": "data/best_plate_detector.pt",
+  "timestamp": "2026-06-21T22:06:10.328695",
+  "total_detections": 1,
+  "detections": [
+    {
+      "plate_id": 1,
+      "bbox": [
+        255.11219787597656,
+        170.49093627929688,
+        335.8006896972656,
+        206.01080322265625
+      ],
+      "confidence": 0.34210044145584106,
+      "crop_file": "plate_01_crop.jpg"
+    }
+  ]
+}

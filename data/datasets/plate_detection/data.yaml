@@ -1,0 +1,32 @@
+# Vietnamese License Plate Detection Dataset Configuration
+# For YOLOv11 Training
+
+# Dataset paths
+path: D:/ComputerVisionLasted/License Plate Detection Dataset
+train: images/train
+val: images/val
+test: images/test
+
+# Number of classes
+nc: 1
+
+# Class names
+names:
+  0: license_plate
+
+# Classes count
+nc: 1
+
+# Dataset info
+dataset_info:
+  name: "Vietnamese License Plate Detection"
+  description: "Dataset for detecting Vietnamese license plates"
+  num_train: 6607
+  num_val: 814
+  num_test: 838
+  total_images: 8259
+
+# Image settings
+img_size: 640
+
+# Data augmentation (YOLO format in model config)
