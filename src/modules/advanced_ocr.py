@@ -634,8 +634,6 @@ class AdvancedLPROCRProcessor:
                         result['normalized_text'] = val.normalized_text
                         result['is_valid'] = True
                         result['plate_type'] = val.plate_type.value
-                        if val.get_province:
-                            result['province'] = val.get_province(val.normalized_text)
                         break
         
         return result
