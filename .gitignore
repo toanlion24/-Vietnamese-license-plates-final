@@ -1,0 +1,43 @@
+# Large files - exclude from GitHub
+*.zip
+*.tar.gz
+*.tar
+*.rar
+*.7z
+
+# Model weights (large binary files)
+*.pt
+*.pth
+*.weights
+*.onnx
+*.pkl
+*.pickle
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Results and outputs
+outputs/
+results/
+logs/
