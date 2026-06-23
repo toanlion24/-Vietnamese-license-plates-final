@@ -1,80 +1,140 @@
-# Vietnamese LPR - Gradio OCR Demo
+# Vietnamese LPR - Full Pipeline Demo
 
-Gradio demo cho nhận diện biển số xe Việt Nam với PaddleOCR.
+Gradio demo cho nhận diện biển số xe Việt Nam với **full LPR pipeline**.
+
+## Advanced OCR Pipeline
+
+```
+Input Plate Image
+       │
+       ▼
+┌─────────────────────────────────────────────────┐
+│  PREPROCESSING (7 Methods)                       │
+├─────────────────────────────────────────────────┤
+│  1. Colab Style 2.5x (CLAHE + Sharpen)         │
+│  2. Colab Style 3.0x                           │
+│  3. Colab Style 4.0x                           │
+│  4. Dark Condition Gamma 2.5                    │
+│  5. Dark Condition Gamma 3.0                    │
+│  6. Grayscale + Binarize                        │
+│  7. Low-light Enhancement                       │
+└─────────────────────────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────────────────┐
+│  ENSEMBLE OCR (2 Engines)                       │
+├─────────────────────────────────────────────────┤
+│  Engine 1: PaddleOCR SVTR_LCNet                 │
+│  Engine 2: PaddleOCR CRNN                       │
+│                                                 │
+│  Total: 7 preprocessing × 2 engines = 14 runs   │
+└─────────────────────────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────────────────┐
+│  BEST SELECTION                                 │
+│  - Select result with highest confidence         │
+│  - Validate against plate format rules           │
+│  - Return top 3 candidates for review            │
+└─────────────────────────────────────────────────┘
+       │
+       ▼
+Output: [Best Text, Confidence, All Candidates]
+```
+
+## Model Performance
+
+| Metric | Training Value |
+|:------:|:--------------:|
+| **Precision** | 99.76% |
+| **Recall** | 99.83% |
+| **mAP@50** | 99.48% |
+| **mAP@50-95** | 99.43% |
+
+**Training Details:**
+- Model: YOLO11s (pretrained)
+- Epochs: 100
+- Optimizer: AdamW
+- Batch size: 16
+- Image size: 640x640
 
 ## Chạy demo
 
 ```bash
-# 1. Đảm bảo đã cài dependencies
-pip install paddlepaddle==2.6.2 "paddleocr>=2.7,<3.0" "albumentations<1.5" "gradio<6"
+# 1. Cài dependencies
+pip install ultralytics gradio opencv-python paddleocr paddlepaddle
 
 # 2. Chạy demo
-python src/modules/gradio_lpr_ocr.py
+python gradio_demo.py
 ```
 
-Server sẽ chạy tại: **http://localhost:7870**
+Server sẽ chạy tại: **http://localhost:7860**
 
 ## Tính năng
 
-- **Tải ảnh lên chủ động**: Upload ảnh từ máy tính hoặc paste từ clipboard
-- **Demo images**: 2 ảnh mẫu để test nhanh
-- **Tùy chỉnh OCR**:
-  - Scale Factor (1-8): Phóng to ảnh trước khi OCR
-  - Min Confidence (0.3-0.95): Ngưỡng confidence tối thiểu
-- **Hiển thị kết quả**:
-  - Ảnh đã xử lý (annotated)
-  - Gallery các biển số đã cắt
-  - Chi tiết text OCR (gốc, chuẩn hóa, loại biển số, tỉnh/TP)
+### Tab 1: Full LPR Pipeline (YOLO + OCR)
+- **Detection**: YOLO11s phát hiện vị trí biển số
+- **OCR**: PaddleOCR đọc text từ biển số
+- **Validation**: Kiểm tra format biển số Việt Nam
+- **Gallery**: Hiển thị các biển số đã cắt
+
+### Tab 2: Detection Only
+- Chỉ phát hiện vị trí biển số (không đọc text)
+
+### Tab 3: Folder Watch
+- Tự động xử lý ảnh trong thư mục
 
 ## Sử dụng qua Gradio Client API
 
 ```python
 from gradio_client import Client, handle_file
 
-client = Client("http://localhost:7870/")
+client = Client("http://localhost:7860/")
 
-# Upload và xử lý ảnh
+# Full LPR Pipeline
 result = client.predict(
-    image=handle_file("path/to/plate.jpg"),
+    image=handle_file("path/to/car.jpg"),
+    conf_threshold=0.25,
     scale_factor=4,
-    min_confidence=0.5,
-    api_name="/process_image"
+    min_ocr_conf=0.3,
+    api_name="/process_full_lpr"
 )
 
-# result[0] = annotated image path
-# result[1] = gallery of plates
-# result[2] = detailed text results
+# result[0] = annotated image with bboxes + OCR text
+# result[1] = gallery of cropped plates
+# result[2] = detailed results text
 ```
 
-## Endpoints
+## Vietnamese License Plate Types
 
-| Endpoint | Description |
-|----------|-------------|
-| `/process_image` | Xử lý ảnh OCR với PaddleOCR |
-| `/load_demo1` | Load ảnh demo (full image) |
-| `/load_demo2` | Load ảnh demo (cropped plate) |
+| Type | Format | Example |
+|------|--------|---------|
+| Private Car | XX-YYYY.NN | 30A-1234.56 |
+| Motorcycle | YY-NNNNN / YY-XXX-YY | 43-12345 / 80-NG-63 |
+| Police | XX-YYYY-NN | 60-1234.56 |
+| Army | YYYYYY-NN | 123456-78 |
+| Commercial | XX-YYYY.NN | 51-1234.56 |
 
-## Kiến trúc
+## Model Files
+
+| File | Size | Description |
+|------|------|-------------|
+| `weights/best.pt` | 18.3 MB | Best model weights (PyTorch) |
+| `weights/best.onnx` | 36.1 MB | ONNX format for deployment |
+| `weights/last.pt` | 18.3 MB | Last checkpoint |
+
+## Dependencies
 
 ```
-User Upload → Image Input → OCR Processor → Results
-                                    ↓
-                            [Enhancement]
-                            [Upscaling]
-                            [PaddleOCR]
-                            [Validation]
-                                    ↓
-                            [Annotated Image]
-                            [Plate Gallery]
-                            [Results Text]
+ultralytics>=8.0.0
+gradio>=4.0.0
+opencv-python>=4.8.0
+paddleocr>=2.7.0
+paddlepaddle>=2.5.0
+numpy>=1.24.0
+torch>=2.0.0
 ```
-
-## Demo Test Results
-
-| Image | Detected Text | Confidence | Type |
-|-------|--------------|------------|------|
-| plate_01_crop.jpg | 80-NG-63 | 90.8% | motorcycle |
 
 ## Ports
 
-- Default: 7870 (configurable in `gradio_lpr_ocr.py`)
+- Default: 7860

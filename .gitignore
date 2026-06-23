@@ -18,6 +18,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.cpython-*.pyc
 
 # Virtual environments
 venv/
@@ -41,3 +42,7 @@ Thumbs.db
 outputs/
 results/
 logs/
+
+# Test images
+test_*.jpg
+test_*.png
